@@ -6,7 +6,7 @@
   // URL del Google Apps Script
   const heroku_url = 'https://cors-anywhere.herokuapp.com/'
   const google_sheet_url = process.env.VUE_APP_GOOGLE_SHEET_URL
-  const url = heroku_url + google_sheet_url
+  let url = heroku_url + google_sheet_url
 
   const initiative = reactive({ values: null });
   const showReasonInput = ref(false);
@@ -14,17 +14,14 @@
   const message = ref("");
   const loading = ref(false);
   const router = useRouter();
-
-  const logout = () => {
-    localStorage.removeItem("user");
-    router.push("/login");
-  };
+  const user = ref("");
 
   const fetchNextInitiative = async () => {
+    user.value = localStorage.getItem("user");
+    let userUrl = url + "?username=" + user.value;
+
     try {
-      console.log(url)
-      const { data } = await axios.get(url);
-      console.log(data)
+      const { data } = await axios.get(userUrl);
       if (data.message) {
         message.value = "No hay más iniciativas para revisar. ¡Buen trabajo!";
         initiative.values = null;
@@ -51,22 +48,32 @@
       return;
     }
 
+    // Obtenemos el nombre del usuario
+    user.value = localStorage.getItem("user");
+
     const payload = {
-      row: initiative.row, // Asegúrate de que la API devuelve el número de fila
+      row: initiative.row,
       status,
       reason: status === "KO" ? koReason.value : "",
+      user: user.value,
     };
+
+    console.log(payload);
 
     loading.value = true; // Activar pantalla de carga
 
     try {
       const { data } = await axios.post(url, payload);
-      console.log(data)
       if (data.status === "success") {
-        message.value = "Actualizado correctamente.";
-        showReasonInput.value = false;
-        koReason.value = "";
-        fetchNextInitiative(); // Obtener la siguiente fila
+        if (status === "UNLOCK") {
+          localStorage.removeItem("user"); // Borrar usuario guardado
+          router.push("/");
+        }else {
+          message.value = "Actualizado correctamente.";
+          showReasonInput.value = false;
+          koReason.value = "";
+          fetchNextInitiative(); // Obtener la siguiente fila
+        }
       } else {
         message.value = "Error al actualizar.";
         loading.value = false;
@@ -112,6 +119,9 @@
       </button>
       <button type="button" class="btn btn-danger mx-2" @click="showKoReason" :disabled="loading">
         Error en transcripción
+      </button>
+      <button type="button" class="btn btn-secondary mx-2" @click="markResult('UNLOCK')" :disabled="loading">
+        Salir
       </button>
     </div>
 

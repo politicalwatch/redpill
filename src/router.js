@@ -7,13 +7,13 @@ const isAuthenticated = () => !!localStorage.getItem("user");
 const routes = [
     { path: "/", component: LoginPage },
     {
-        path: "/Interventions",
+        path: "/interventions",
         component: InterventionsPage,
         beforeEnter: (to, from, next) => {
             if (isAuthenticated()) {
                 next();
             } else {
-                next("/login");
+                next("/");
             }
         },
     },

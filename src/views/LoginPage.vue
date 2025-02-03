@@ -2,11 +2,19 @@
     import { ref } from "vue";
     import axios from "axios";
     import { useRouter } from "vue-router";
+    import { onMounted } from "vue";
 
     const router = useRouter();
     const username = ref("");
     const password = ref("");
     const error = ref("");
+
+    onMounted(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        router.push("/interventions"); // Redirigir automáticamente
+      }
+    });
 
     const login = async () => {
       const heroku_url = 'https://cors-anywhere.herokuapp.com/'
@@ -15,13 +23,13 @@
 
         try {
             const response = await axios.post(scriptURL, {
-            username: username.value,
+            // username: username.value,
             password: password.value,
             });
 
             if (response.status === 200) {
-              localStorage.setItem("user", JSON.stringify({ username: username.value }));
-              router.push("/Interventions");
+              localStorage.setItem("user", username.value);
+              router.push("/interventions"); 
             } else {
               error.value = "Credenciales incorrectas";
             }
