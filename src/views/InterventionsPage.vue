@@ -1,12 +1,10 @@
 <script setup>
   import axios from 'axios';
-  import { onMounted, reactive, ref } from 'vue';
+  import { onMounted, onUnmounted, reactive, ref } from 'vue';
   import { useRouter } from "vue-router";
 
   // URL del Google Apps Script
-  const heroku_url = 'https://cors-anywhere.herokuapp.com/'
-  const google_sheet_url = process.env.VUE_APP_GOOGLE_SHEET_URL
-  let url = heroku_url + google_sheet_url
+  const url = process.env.VUE_APP_GOOGLE_SHEET_URL
 
   const initiative = reactive({ values: null });
   const showReasonInput = ref(false);
@@ -21,7 +19,10 @@
     let userUrl = url + "?username=" + user.value;
 
     try {
-      const { data } = await axios.get(userUrl);
+      const { data } = await axios.get(userUrl, {
+        redirect: 'follow'
+      });
+
       if (data.message) {
         message.value = "No hay más iniciativas para revisar. ¡Buen trabajo!";
         initiative.values = null;
@@ -37,6 +38,29 @@
       loading.value = false;
     }
   };
+
+    const unlockIntervention = async () => {
+      user.value = localStorage.getItem("user");
+        if (!user.value) return; // Si no hay usuario, no hacemos nada
+
+      // 🔹 Convertir los datos en FormData (obligatorio para sendBeacon)
+      const payload = new FormData();
+      payload.append("row", initiative.row);
+      payload.append("status", "UNLOCK");
+      payload.append("reason", "");
+      payload.append("user", "");
+
+      const payloadObject = Object.fromEntries(payload.entries());
+      const a = JSON.stringify(payloadObject);
+
+      
+      try {
+        let response = navigator.sendBeacon(url, payload); // Enviar petición sin bloquear la salida
+        localStorage.removeItem("user");
+      } catch (error) {
+        console.error("Error al liberar registro:", error);
+      }
+    };
 
   const showKoReason = () => {
     showReasonInput.value = true;
@@ -55,7 +79,7 @@
       row: initiative.row,
       status,
       reason: status === "KO" ? koReason.value : "",
-      user: user.value,
+      user: status !== "UNLOCK" ? user.value  : "",
     };
 
     console.log(payload);
@@ -84,7 +108,15 @@
     }
   };
 
-  onMounted(fetchNextInitiative);
+  onMounted(() => {
+    // fetchNextInitiative();
+    window.addEventListener("beforeunload", unlockIntervention);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener("beforeunload", unlockIntervention);
+  });
+  
 </script>
 
 <template>

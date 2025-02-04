@@ -17,14 +17,11 @@
     });
 
     const login = async () => {
-      const heroku_url = 'https://cors-anywhere.herokuapp.com/'
-      const google_sheet_url = process.env.VUE_APP_GOOGLE_SHEET_URL
-      const scriptURL = heroku_url + google_sheet_url
+      const url = process.env.VUE_APP_GOOGLE_SHEET_URL
 
         try {
-            const response = await axios.post(scriptURL, {
-            // username: username.value,
-            password: password.value,
+            const response = await axios.post(url, {
+              password: password.value,
             });
 
             if (response.status === 200) {
