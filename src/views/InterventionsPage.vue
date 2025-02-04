@@ -4,7 +4,10 @@
   import { useRouter } from "vue-router";
 
   // URL del Google Apps Script
-  const url = process.env.VUE_APP_GOOGLE_SHEET_URL
+  const heroku_url = 'https://cors-anywhere.herokuapp.com/'
+  const google_sheet_url = process.env.VUE_APP_GOOGLE_SHEET_URL
+  let url = heroku_url + google_sheet_url
+
 
   const initiative = reactive({ values: null });
   const showReasonInput = ref(false);
@@ -109,7 +112,7 @@
   };
 
   onMounted(() => {
-    // fetchNextInitiative();
+    fetchNextInitiative();
     window.addEventListener("beforeunload", unlockIntervention);
   });
 

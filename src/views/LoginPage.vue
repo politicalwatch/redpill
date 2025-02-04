@@ -2,7 +2,6 @@
     import { ref } from "vue";
     import axios from "axios";
     import { useRouter } from "vue-router";
-    import { onMounted } from "vue";
 
     const router = useRouter();
     const username = ref("");
@@ -15,13 +14,15 @@
         router.push("/interventions"); // Redirigir automáticamente
       }
     });
-
+    
     const login = async () => {
-      const url = process.env.VUE_APP_GOOGLE_SHEET_URL
+      const heroku_url = 'https://cors-anywhere.herokuapp.com/'
+      const google_sheet_url = process.env.VUE_APP_GOOGLE_SHEET_URL
+      const scriptURL = heroku_url + google_sheet_url
 
         try {
-            const response = await axios.post(url, {
-              password: password.value,
+            const response = await axios.post(scriptURL, {
+            password: password.value,
             });
 
             if (response.status === 200) {
