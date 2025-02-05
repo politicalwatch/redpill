@@ -14,7 +14,7 @@
         router.push("/interventions"); // Redirigir automáticamente
       }
     });
-    
+
     const login = async () => {
       const heroku_url = 'https://cors-anywhere.herokuapp.com/'
       const google_sheet_url = process.env.VUE_APP_GOOGLE_SHEET_URL
@@ -54,8 +54,4 @@
     </div>
   </div>
 </template>
-
-<style>
-/* Opcional: Estilos personalizados */
-</style>
 

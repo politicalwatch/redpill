@@ -44,9 +44,8 @@
 
     const unlockIntervention = async () => {
       user.value = localStorage.getItem("user");
-        if (!user.value) return; // Si no hay usuario, no hacemos nada
+        if (!user.value) return;
 
-      // 🔹 Convertir los datos en FormData (obligatorio para sendBeacon)
       const payload = new FormData();
       payload.append("row", initiative.row);
       payload.append("status", "UNLOCK");
@@ -148,14 +147,14 @@
       </div>
     </div>
 
-    <div class="mt-4 flex justify-center space-x-4 centered">
-      <button type="button" class="btn btn-success mx-2" @click="markResult('OK')" :disabled="loading">
+    <div class="buttons-container mt-4">
+      <button type="button" class="btn btn-success" @click="markResult('OK')" :disabled="loading">
         Transcripción correcta
       </button>
-      <button type="button" class="btn btn-danger mx-2" @click="showKoReason" :disabled="loading">
+      <button type="button" class="btn btn-danger" @click="showKoReason" :disabled="loading">
         Error en transcripción
       </button>
-      <button type="button" class="btn btn-secondary mx-2" @click="markResult('UNLOCK')" :disabled="loading">
+      <button type="button" class="btn btn-secondary" @click="markResult('UNLOCK')" :disabled="loading">
         Salir
       </button>
     </div>
@@ -175,6 +174,29 @@
 </template>
 
 <style>
+.buttons-container {
+  display: flex;
+  flex-direction: column; /* Apilar los botones en pantallas pequeñas */
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Espaciado entre los botones */
+}
+
+.buttons-container .btn {
+  width: 100%; /* Los botones ocupan todo el ancho en pantallas pequeñas */
+  max-width: 250px; /* Limite de ancho para los botones */
+}
+
+@media (min-width: 576px) {
+  .buttons-container {
+    flex-direction: row; /* En pantallas grandes, los botones se alinean en una fila */
+  }
+  .buttons-container .btn {
+    width: 50%; /* Los botones ocupan el 50% del ancho en pantallas grandes */
+  }
+}
+
+
 /* Estilos para la pantalla de carga */
 .loading-overlay {
   position: fixed;
