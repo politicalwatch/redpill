@@ -1,27 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginPage from "./views/LoginPage.vue";
-import InterventionsPage from "./views/InterventionsPage.vue"
-
-const isAuthenticated = () => !!localStorage.getItem("user");
-
-const routes = [
-    { path: "/", component: LoginPage },
+  const routes = [
     {
-        path: "/interventions",
-        component: InterventionsPage,
-        beforeEnter: (to, from, next) => {
-            if (isAuthenticated()) {
-                next();
-            } else {
-                next("/");
-            }
-        },
-    },
-];
+      path: '/',
+      name: 'RedirectToAppScript',
+      beforeEnter() {
+        window.location.href = process.env.VUE_APP_GOOGLE_SHEET_URL;
+      }
+    }
+  ];
 
 const router = createRouter({
     history: createWebHistory(),
-    routes,
-});
-
-export default router;
+    routes
+  });
+  
+  export default router;
